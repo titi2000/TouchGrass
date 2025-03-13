@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Grass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chill+Chill&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #9ACD32;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Chill Chill', sans-serif;
+        }
+        h1 {
+            color: white;
+            font-size: 3rem;
+            text-align: center;
+        }
+        button {
+            margin-top: 20px;
+            padding: 15px 25px;
+            font-size: 1.5rem;
+            border: none;
+            background-color: white;
+            color: #57D53B;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        button:hover {
+            background-color: #e0e0e0;
+        }
+        video, canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Please touch grass</h1>
+    <button onclick="openCamera()">I touch grass</button>
+
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
+    <input type="file" accept="image/*" capture="environment" id="inputPhoto" style="display: none;" onchange="processPhoto(event)">
+
+    <script>
+        function openCamera() {
+            document.getElementById("inputPhoto").click();
+        }
+
+        function processPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.getElementById("canvas");
+                    const ctx = canvas.getContext("2d");
+
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Ajouter le texte avec la date
+                    const date = new Date();
+                    const dateString = `I touch grass (${date.toLocaleDateString()})`;
+
+                    const fontSize = Math.floor(canvas.width * 0.08); // Ajuste la taille du texte en fonction de l'image
+                    ctx.font = `bold ${fontSize}px Arial`;
+                    ctx.fillStyle = "white";
+                    ctx.strokeStyle = "black";
+                    ctx.lineWidth = Math.floor(fontSize * 0.1); // Ajuste l'épaisseur du contour
+                    ctx.textAlign = "center";
+
+                    const x = canvas.width / 2;
+                    const y = canvas.height - fontSize * 1.5; // Place le texte en bas mais pas trop proche du bord
+
+                    ctx.strokeText(dateString, x, y);
+                    ctx.fillText(dateString, x, y);
+
+                    // Télécharger l'image
+                    const link = document.createElement("a");
+                    link.download = "i_touch_grass.png";
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+
+</body>
+</html>
